@@ -26,6 +26,7 @@
     "hpsweb-google-distance": "^1.1.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
+    "node-geocoder": "^4.0.0",
     "twilio": "^3.75.0"
   }
 }

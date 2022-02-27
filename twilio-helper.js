@@ -71,9 +71,6 @@ async function sendMessage(sid, msg) {
 }
 
 // addBot(sid);
-// addPerson(sid, "+16504756985");
-// addPerson(sid, "+15106764409");
-// addPerson(sid, "+16266521052");
 
 // sendMessage(sid, "Hey everyone");
 
@@ -108,31 +105,11 @@ async function createGroupChat(driver, passengers, trip) {
     await sendMessage(sid, message);
     setTimeout(async () => {
       await closeChat(sid);
-    }, 1000);
-  }, 1000);
+    }, 2000);
+  }, 2000);
 }
 
 let trip = {
-  eventName: "Bowling Night",
-  organizerName: "Sydney Chiang",
-  phoneNumber: "+***REMOVED***",
-  destination: "3415 Michelson Dr Irvine, CA 92612",
-  startTime: Moment("2022-03-01 18:00", 'YYYY-MM-DD HH:mm'),
-  endTime: Moment("2022-03-01 23:00", 'YYYY-MM-DD HH:mm'),
-  drivers: [{
-    name: "Ethan Nguyen",
-    phone: "+17148840059"
-  }],
-  passengers: [{
-    name: "Chris Tian",
-    phone: "+16504756985"
-  },{
-    name: "Jane Vo",
-    phone: "+16266521052"
-  },{
-    name: "Alec Chen",
-    phone: "+15106764409"
-  }],
 };
 
 // closeChat("CH8daea75635d341bebd9948d8282eadae");

@@ -9,39 +9,60 @@ require('dotenv').config()
 
 app.use(express.json(), cors({ credentials: true, origin: true }));
 
+distance.apiKey = process.env.GOOGLE;
+
+// distance.get({
+//   index: 1,
+//   origin: "33.6434103,-117.8420698",
+//   destination: "33.677,-117.8124"
+// }).then(function (data) {
+//   console.log(data);
+// })
+const options = {
+  provider: 'google',
+
+  // Optional depending on the providers
+  // fetch: customFetchImplementation,
+  apiKey: process.env.GOOGLE, // for Mapquest, OpenCage, Google Premier
+  // formatter: null // 'gpx', 'string', ...
+};
+
+const NodeGeocoder = require('node-geocoder');
+const geocoder = NodeGeocoder(options);
+
 let trips = {
   test: {
     eventName: "Bowling Night",
     organizerName: "Sydney Chiang",
-    phoneNumber: "+***REMOVED***",
+    phoneNumber: "+",
     destination: "3415 Michelson Dr Irvine, CA 92612",
     startTime: Moment("2022-03-01 18:00", 'YYYY-MM-DD HH:mm'),
     endTime: Moment("2022-03-01 23:00", 'YYYY-MM-DD HH:mm'),
     drivers: [{
       name: "Ethan Nguyen",
-      phone: "+17148840059"
+      phone: "+"
     }],
     passengers: [{
       name: "Chris Tian",
-      phone: "+16504756985"
+      phone: "+"
     },{
       name: "Jane Vo",
-      phone: "+16266521052"
+      phone: "+"
     },{
       name: "Alec Chen",
-      phone: "+15106764409"
+      phone: "+"
     }],
   },
   test2: {
     eventName: "Bowling Night",
     organizerName: "Sydney Chiang",
-    phoneNumber: "+***REMOVED***",
+    phoneNumber: "+",
     destination: "3415 Michelson Dr Irvine, CA 92612",
     startTime: Moment("2022-03-01 18:00", 'YYYY-MM-DD HH:mm'),
     endTime: Moment("2022-03-01 23:00", 'YYYY-MM-DD HH:mm'),
     drivers: [{
       name: "Ethan Nguyen",
-      phone: "+17148840059",
+      phone: "+",
       coords: {
         lat: 33.6459,
         lng: -117.8428
@@ -49,7 +70,7 @@ let trips = {
       passengers: 4
     },{
       name: "Sydney Chiang",
-      phone: "+16504756985",
+      phone: "+",
       coords: {
         lat: 33.6507,
         lng: -117.8383
@@ -58,55 +79,43 @@ let trips = {
     }],
     passengers: [{
       name: "Chris Tian",
-      phone: "+16504756985",
+      phone: "+",
       coords: {
         lat: 33.645,
         lng: -117.844
       }
     },{
       name: "Jane Vo",
-      phone: "+16266521052",
+      phone: "+",
       coords: {
         lat: 33.646,
         lng: -117.8443
       }
     },{
       name: "Alec Chen",
-      phone: "+15106764409",
+      phone: "+",
       coords: {
         lat: 33.651,
         lng: -117.8332
       }
     },{
       name: "Zubair Sidhu",
-      phone: "+16504756985",
+      phone: "+",
       coords: {
         lat: 33.6498,
         lng: -117.8338
       }
     }],
   },
-  test3: {
-    eventName: "Ice Skating",
-    organizerName: "Joshua Liu",
-    phoneNumber: "+***REMOVED***",
-    destination: "888 Phantom Irvine, CA 92612",
-    startTime: Moment("2022-03-15 18:00", 'YYYY-MM-DD HH:mm'),
-    endTime: Moment("2022-03-15 23:00", 'YYYY-MM-DD HH:mm'),
-    drivers: [{
-      name: "Ethan Nguyen",
-      phone: "+17148840059"
-    }],
-    passengers: [{
-      name: "Chris Tian",
-      phone: "+16504756985"
-    },{
-      name: "Jane Vo",
-      phone: "+16266521052"
-    },{
-      name: "Alec Chen",
-      phone: "+15106764409"
-    }],
+  '356cuucago5': {
+    eventName: "Board Games in the Park",
+    organizerName: 'Jane Vo',
+    phoneNumber: '+',
+    destination: 'Arcadia County Park, South Santa Anita Avenue, Arcadia, CA, USA',
+    startTime: Moment("2022-03-20T12:00:00-07:00"),
+    endTime: Moment("2022-03-20T14:00:00-07:00"),
+    drivers: [],
+    passengers: []
   }
 };
 let users = {};
@@ -147,7 +156,7 @@ app.post("/joinTrip/:tripId", (req, res) => {
 });
 
 // creates Trip
-app.post("/createTrip", (req, res) => {
+app.post("/createTrip", async (req, res) => {
   //create tripID
   const tripID = Math.random().toString(36).substring(2, 20);
 
@@ -163,6 +172,10 @@ app.post("/createTrip", (req, res) => {
     drivers: [],
     passengers: [],
   };
+
+  const coordResult = await getCoordinates(params.destination);
+  // console.log(coordResult);
+  params.coords = {lat: coordResult[0].latitude, lng: coordResult[0].longitude};
 
   //store trip in db lmfao
   trips[tripID] = params;
@@ -206,7 +219,7 @@ function getDriverByName(drivers, name) {
 app.post("/finalize/:tripId", async (req, res) => {
   const tripId = req.params["tripId"];
   let drivers = trips[tripId].drivers;
-  let riders = trips[tripId].passengers;
+  let riders = [...trips[tripId].passengers];
   const numDrivers = drivers.length;
   const numRiders = riders.length;
   const ridersPerGroup = numRiders/numDrivers;
@@ -276,14 +289,8 @@ app.post("/finalize/:tripId", async (req, res) => {
   // TODO: display finalized data in dashboard
 });
 
-distance.apiKey = process.env.GOOGLE;
-
-// distance.get({
-//   index: 1,
-//   origin: "33.6434103,-117.8420698",
-//   destination: "33.677,-117.8124"
-// }).then(function (data) {
-//   console.log(data);
-// })
+async function getCoordinates(address) {
+  return await geocoder.geocode(address);
+};
 
 app.listen(8080, () => console.log("Example app listening on port 8080"));
