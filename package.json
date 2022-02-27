@@ -17,8 +17,15 @@
   },
   "homepage": "https://github.com/nguyenethan01/wepool-backend#readme",
   "dependencies": {
+    "@twilio/conversations": "^2.0.1",
     "body-parser": "^1.19.2",
     "cors": "^2.8.5",
-    "express": "^4.17.3"
+    "dotenv": "^16.0.0",
+    "eslint": "^8.10.0",
+    "express": "^4.17.3",
+    "hpsweb-google-distance": "^1.1.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1",
+    "twilio": "^3.75.0"
   }
 }
